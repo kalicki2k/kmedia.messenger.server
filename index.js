@@ -1,3 +1,4 @@
+var config = require('./config.js');
 var bootstrap = require('./components/bootstrap.js');
 var modules = bootstrap.init([
     {
@@ -11,6 +12,7 @@ var modules = bootstrap.init([
         moduleName: 'http',
         callback: function(modules) {
             modules['http'] = modules['http'].Server(modules['express']);
+            modules['http'].listen(config.port);
             return modules;
         }
     },
@@ -24,12 +26,9 @@ var modules = bootstrap.init([
     {
         moduleName: 'winston',
         callback: function(modules) {
-            modules['winston'].console = true;
-            modules['winston'].level = 'debug';
-            modules['winston'].logfile = 'logfile.json';
-
-            modules['winston'].add(modules['winston'].transports.File, {filename: modules['winston'].logfile});
-            if (!modules['winston'].console) {
+            modules['winston'].level = config.logger.level;
+            modules['winston'].add(modules['winston'].transports.File, {filename: config.logger.logfile});
+            if (!config.logger.console) {
                 modules['winston'].remove(modules['winston'].transports.Console);
             }
             return modules;
@@ -37,31 +36,12 @@ var modules = bootstrap.init([
     }
 ]);
 
-var app = modules['express'];
-var server = modules['http'];
+var http = modules['express'];
 var io = modules['socket.io'];
 var winston = modules['winston'];
 
-/**
- * Winston configuration
- */
-/*
-
-winston.console = true;
-winston.level = 'debug';
-winston.logfile = 'logfile.json';
-
-winston.add(winston.transports.File, {filename: winston.logfile});
-if (!winston.console) {
-    winston.remove(winston.transports.Console);
-}
-
-*/
-
-server.listen(3000);
-
-app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/index.html');
+http.get('/', function (req, res) {
+    res.sendFile(__dirname + '/index.html');
 });
 
 // listen on connection
