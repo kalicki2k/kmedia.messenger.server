@@ -46,7 +46,7 @@ io.on('connection', function (socket) {
 
     socket.on('send.message', function (data) {
         winston.info(data.message)
-        socket.emit('add.message', {message: data.message});
+        socket.broadcast.emit('add.message', {message: data.message});
     });
 
     // socket.on('user.join', function () {
