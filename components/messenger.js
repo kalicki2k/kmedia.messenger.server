@@ -5,8 +5,8 @@ module.exports = {
             winston.info('User has been connected.');
 
             // client will be redirected to a dynamic generated room
-            socket.join(socket.id);
-
+            // socket.join(socket.id);
+            socket.join('testroom');
 
             // user has logged in
             socket.on('user.init', function (data) {
@@ -15,24 +15,15 @@ module.exports = {
 
             socket.on('send.message', function (data) {
                 winston.info(data.message);
-                socket.broadcast.to(socket.id).emit('add.message', {message: data.message});
+                socket.broadcast.to('testroom').emit('add.message', {
+                    user: data.user,
+                    message: data.message
+                });
             });
-
-            // socket.on('user.join', function () {
-            //     console.log(user);
-            // });
 
             socket.on('disconnect', function () {
                 winston.info('User disconnected.');
             });
-
-            //
-            // console.log(socket.id)
-            //
-            // socket.emit('news', { hello: 'world' });
-            // socket.on('my other event', function (data) {
-            //     console.log(data);
-            // });
         });
     }
 };
