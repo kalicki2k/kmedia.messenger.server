@@ -1,5 +1,6 @@
 var config = require('./config.js');
 var bootstrap = require('./components/bootstrap.js');
+var messenger = require('./components/messenger.js');
 var modules = bootstrap.init([
     {
         moduleName: 'express',
@@ -44,34 +45,4 @@ http.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-// listen on connection
-io.on('connection', function (socket) {
-
-    winston.info('User has been connected.');
-
-    socket.on('user.init', function (data) {
-        winston.info('User ' + data.user.name + ' has logged in.');
-        //socket.emit('user.join', {hello: 'world'});
-    });
-
-    socket.on('send.message', function (data) {
-        winston.info(data.message)
-        socket.broadcast.emit('add.message', {message: data.message});
-    });
-
-    // socket.on('user.join', function () {
-    //     console.log(user);
-    // });
-
-    socket.on('disconnect', function () {
-        winston.info('User disconnected.');
-    });
-
-    //
-    // console.log(socket.id)
-    //
-    // socket.emit('news', { hello: 'world' });
-    // socket.on('my other event', function (data) {
-    //     console.log(data);
-    // });
-});
+messenger.init(modules['socket.io'], modules['winston']);
