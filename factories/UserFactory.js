@@ -3,7 +3,6 @@ var _ = require('lodash');
 
 module.exports = {
     build: function (customUser) {
-        var defaultUser = userModel;
-        return _.extend(defaultUser, customUser);
+        return _.extend(new userModel(), customUser);
     }
 };

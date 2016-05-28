@@ -1,23 +1,24 @@
 var _ = require('lodash');
+var users = [];
 
-module.exports = function() {
+module.exports = function () {
+
     return {
-        _users: [],
 
-        addUser: function (userModel) {
-            this._users.push(userModel);
+        add: function (userModel) {
+            users.push(userModel);
         },
 
-        searchUser: function (userModel) {
-            return _.filter(this._users, userModel);
+        search: function (userModel) {
+            return (arguments.length > 0) ? _.find(users, userModel) : users;
         },
 
-        hasUser: function (userModel) {
-            return (_.size(_.filter(this._users, userModel)) > 0);
+        has: function (userModel) {
+            return (_.size(_.filter(users, userModel)) > 0);
         },
 
-        removeUser: function (userModel) {
-            delete this._users[_.findIndex(this._users, userModel)];
+        remove: function (userModel) {
+            delete users[_.findIndex(users, userModel)];
         }
     };
 }();
