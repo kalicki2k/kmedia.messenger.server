@@ -41,14 +41,6 @@ var http = modules['express'];
 var io = modules['socket.io'];
 var winston = modules['winston'];
 
-
-var userFactory = require('./factories/UserFactory.js');
-var userRepository = require('./repositories/UserRepository.js');
-
-var user = userFactory.build({_username:'Kalicki'}).id(0);
-
-userRepository.addUser(user);
-
 http.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });

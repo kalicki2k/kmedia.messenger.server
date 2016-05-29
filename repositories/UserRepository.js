@@ -6,10 +6,10 @@ module.exports = function () {
     return {
 
         add: function (userModel) {
-            users.push(userModel);
+            return users.push(userModel);
         },
 
-        search: function (userModel) {
+        get: function (userModel) {
             return (arguments.length > 0) ? _.find(users, userModel) : users;
         },
 
@@ -18,7 +18,11 @@ module.exports = function () {
         },
 
         remove: function (userModel) {
-            delete users[_.findIndex(users, userModel)];
+            return users.splice(_.findIndex(users, userModel), 1);
+        },
+
+        search: function (userModel) {
+            return (arguments.length > 0) ? _.filter(users, userModel) : users;
         }
     };
 }();
