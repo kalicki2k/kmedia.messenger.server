@@ -21,7 +21,7 @@ module.exports = {
                 socket
                     .emit('client.join', user)
                     .broadcast
-                    .emit('client.join', user);
+                    .emit('room.join', user);
                 winston.info('User ' + user.name + ' has logged in.');
             });
 
@@ -32,8 +32,6 @@ module.exports = {
 
                 userRepository.add(user);
                 socket
-                    .emit('operator.join', user)
-                    .broadcast
                     .emit('operator.join', user);
                 winston.info('User ' + user.name + ' has logged in.');
             });
