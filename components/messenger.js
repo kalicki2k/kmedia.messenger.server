@@ -6,68 +6,53 @@ module.exports = {
     init: function (io, winston) {
         io.on('connection', function (socket) {
             var user = new userModel();
-            user.socketId = socket.id;
 
-            socket.join(socket.id);
+            user.socketId = socket.id;
+            socket.join(user.socketId);
 
             winston.info('User has been connected.');
 
-            socket.on('client.join', function (data) {
+            socket.on('customer.join', function (data) {
                 user.name = data.user.name;
                 user.email = data.user.email;
-                user.role = 'client';
+                user.role = 'customer';
 
                 userRepository.add(user);
-                socket
-                    .emit('client.join', user)
-                    .broadcast
-                    .emit('room.join', user);
-                winston.info('User ' + user.name + ' has logged in.');
+                socket.emit('customer.data', user);
+                socket.broadcast.emit('room.customer.join', user);
+                winston.info('Customer ' + user.name + ' has logged in.');
             });
 
             socket.on('operator.join', function (data) {
                 user.name = data.user.name;
                 user.email = data.user.email;
-                user.role = 'client';
+                user.role = 'operator';
 
                 userRepository.add(user);
-                socket
-                    .emit('operator.join', user);
-                winston.info('User ' + user.name + ' has logged in.');
+                socket.emit('operator.data', user);
+                socket.emit('room.all.customer', userRepository.search({role: 'customer'}));
+                socket.broadcast.emit('room.operator.join', user);
+                winston.info('Operator ' + user.name + ' has logged in.');
             });
 
-            socket.on('clients.all', function () {
-                socket.emit('clients.all', userRepository.search({role: 'client'}));
-            });
-
-            socket.on('room.join', function (data) {
+            socket.on('room.operator.join', function (data) {
                 socket
                     .join(data.room)
                     .emit('room.join');
-                winston.info('User ' + user.name + ' has join ' + data.room + ' room.');
+                winston.info('Operator ' + user.name + ' has join ' + data.room + ' room.');
             });
 
-            socket.on('room.leave', function (data) {
-                socket
-                    .leave(data.room)
-                    .emit('room.leave');
-                winston.info('User ' + user.name + ' has leave ' + data.room + ' room.');
-            });
-
-            socket.on('message.send', function (data) {
+            socket.on('message.sent', function (data) {
                 winston.info(user.name + ': ' + data.message);
 
-                socket.broadcast.to(data.room).emit('message.send', {
+                socket.broadcast.to(data.room).emit('message.received', {
                     user: user.name,
                     message: data.message
                 });
             });
 
             socket.on('disconnect', function () {
-                socket.broadcast.emit('client.disconnect', user);
                 winston.info('User ' + user.name + ' disconnected.');
-                userRepository.remove(user);
-                //delete user;
             });
         });
     }
