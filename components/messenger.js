@@ -1,6 +1,6 @@
 var userModel = require('./../models/UserModel.js');
 var userRepository = require('./../repositories/UserRepository.js');
-var _ = require('lodash');
+//var _ = require('lodash');
 
 module.exports = {
     init: function (io, winston) {
@@ -31,14 +31,12 @@ module.exports = {
                 userRepository.add(user);
                 socket.emit('operator.data', user);
                 socket.emit('room.all.customer', userRepository.search({role: 'customer'}));
-                socket.broadcast.emit('room.operator.join', user);
                 winston.info('Operator ' + user.name + ' has logged in.');
             });
 
             socket.on('room.operator.join', function (data) {
-                socket
-                    .join(data.room)
-                    .emit('room.join');
+                socket.join(data.room);
+                socket.broadcast.to(data.room).emit('room.operator.join', user);
                 winston.info('Operator ' + user.name + ' has join ' + data.room + ' room.');
             });
 
@@ -52,7 +50,14 @@ module.exports = {
             });
 
             socket.on('disconnect', function () {
-                winston.info('User ' + user.name + ' disconnected.');
+                if (user.role == 'customer') {
+                    winston.info('Customer ' + user.name + ' disconnected.');
+                    socket.broadcast.emit('customer.leave', user);
+                } else if (user.role == 'operator') {
+                    winston.info('Operator ' + user.name + ' disconnected.');
+                    socket.broadcast.emit('operator.leave', user);
+                }
+                userRepository.remove(user);
             });
         });
     }
