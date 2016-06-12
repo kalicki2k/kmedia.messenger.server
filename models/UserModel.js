@@ -1,11 +1,9 @@
 module.exports = function () {
-    var user = {
+    return {
         id: null,
         name: null,
         email: null,
         socketId: null,
-        role: null,
+        role: null
     };
-
-    return user;
 };
